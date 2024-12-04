@@ -12,7 +12,7 @@
         </div>
         <nav class="Menu">
           <a href="/panel-control">Inicio</a>
-          <a href="/mobiliario">Agregar-Muebles</a>
+          <a href="/mobiliarios">Agregar-Muebles</a>
           <a href="/reportes">Reportes</a>
           <a href="/perfil">Perfil</a>
         </nav>

@@ -9,7 +9,7 @@ const routes = [
     { path: '/registro', component: RegistroUsuario },
     { path: '/login', component: InicioSesion },
     { path: '/panel-control', component: PanelControl },
-    { path: '/mobiliariod', component: mobiliario },
+    { path: '/mobiliarios', component: mobiliario },
 
 ];
 

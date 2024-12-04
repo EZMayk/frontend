@@ -40,51 +40,39 @@ export default {
     };
   },
   methods: {
-    async cargarUsuarios() {
-      // Fetch para obtener el archivo XML desde la ubicación especificada
-      try {
-        const response = await fetch("/usuarios.xml"); // Ruta actualizada
-        const xmlText = await response.text();
+  async cargarUsuarios() {
+    try {
+      const response = await fetch("/usuarios.xml");
+      if (!response.ok) throw new Error("Error al cargar XML.");
 
-        // Parsear el XML
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, "application/xml");
 
-        // Convertir los usuarios del XML en un array de objetos
-        const usuarios = Array.from(xmlDoc.querySelectorAll("usuario")).map(
-          (usuario) => ({
-            nombres: usuario.querySelector("nombres").textContent,
-            apellidos: usuario.querySelector("apellidos").textContent,
-            telefono: usuario.querySelector("telefono").textContent,
-            direccion: usuario.querySelector("direccion").textContent,
-            correo: usuario.querySelector("correo").textContent,
-            contrasena: usuario.querySelector("contrasena").textContent,
-          })
-        );
-
-        // Guardar en el estado
-        this.usuarios = usuarios;
-      } catch (error) {
-        console.error("Error al cargar usuarios desde el XML:", error);
-        this.error = "No se pudo cargar la lista de usuarios.";
-      }
-    },
-    iniciarSesion() {
-      // Validar las credenciales
-      const usuario = this.usuarios.find(
-        (u) => u.correo === this.correo && u.contrasena === this.contrasena
-      );
-
-      if (usuario) {
-        alert(`¡Bienvenido, ${usuario.nombres} ${usuario.apellidos}!`);
-        this.error = null;
-        // Aquí puedes redirigir al panel de control
-        this.$router.push("/panel-control");
-      } else {
-        this.error = "Correo o contraseña incorrectos.";
-      }
-    },
+      this.usuarios = Array.from(xmlDoc.querySelectorAll("usuario")).map((usuario) => ({
+        nombres: usuario.querySelector("nombres").textContent,
+        correo: usuario.querySelector("correo").textContent,
+        contrasena: usuario.querySelector("contrasena").textContent,
+      }));
+    } catch (error) {
+      console.error("Error al cargar usuarios:", error);
+      this.error = "No se pudo cargar la lista de usuarios.";
+    }
   },
+  iniciarSesion() {
+    const usuario = this.usuarios.find(
+      (u) => u.correo === this.correo && u.contrasena === this.contrasena
+    );
+
+    if (usuario) {
+      alert(`Bienvenido, ${usuario.nombres}`);
+      this.$router.push("/panel-control");
+    } else {
+      this.error = "Correo o contraseña incorrectos.";
+    }
+  },
+},
+
   mounted() {
     // Cargar usuarios al montar el componente
     this.cargarUsuarios();

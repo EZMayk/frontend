@@ -107,37 +107,54 @@ export default {
         correo: "",
         contrasena: "",
       },
+      error: null, // Para manejar errores en la interfaz
     };
   },
   methods: {
+    validarDatos() {
+      // Validaciones básicas antes de enviar los datos al servidor
+      if (!this.usuario.nombres.trim()) return "El campo 'Nombres' es obligatorio.";
+      if (!this.usuario.apellidos.trim()) return "El campo 'Apellidos' es obligatorio.";
+      if (!this.usuario.telefono.trim()) return "El campo 'Teléfono' es obligatorio.";
+      if (!this.usuario.direccion.trim()) return "El campo 'Dirección' es obligatorio.";
+      if (!this.usuario.correo.trim()) return "El campo 'Correo' es obligatorio.";
+      if (!this.usuario.contrasena.trim()) return "El campo 'Contraseña' es obligatorio.";
+      if (this.usuario.contrasena.length < 6)
+        return "La contraseña debe tener al menos 6 caracteres.";
+      return null; // Sin errores
+    },
     async registrarse() {
       try {
-        // Validación y envío de datos al servidor
+        // Validar datos antes de enviarlos
+        const mensajeError = this.validarDatos();
+        if (mensajeError) {
+          alert(mensajeError);
+          return;
+        }
+
         const response = await fetch("http://localhost:3000/api/registro", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(this.usuario),
         });
 
         if (response.ok) {
-          const result = await response.json(); // Cambié `data` por `result` para evitar el error
-          console.log("Usuario registrado:", result);
-          alert("Registro exitoso. Redirigiendo al panel de control...");
-          this.$router.push("/panel-control");
+          alert("Usuario registrado con éxito. Redirigiendo...");
+          this.$router.push("/login");
         } else {
+          // Manejar errores específicos del backend
           const errorData = await response.json();
-          alert(`Error al registrar el usuario: ${errorData.message}`);
+          alert(`Error: ${errorData.message || "Error al registrar el usuario."}`);
         }
       } catch (error) {
         console.error("Error en la solicitud:", error);
-        alert("Ocurrió un error inesperado.");
+        alert("No se pudo conectar con el servidor. Asegúrate de que está en ejecución.");
       }
     },
   },
 };
 </script>
+
 
 <style scoped>
 .Encabezado {
@@ -173,22 +190,6 @@ main {
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-button {
-  display: block;
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
 }
 
 footer {
