@@ -37,6 +37,6 @@ export default {
 
 <style>
     body{
-      background-image: url('../src/assets/img/fondo1.jpg');
+      background-image: url('../public/img/fondo1.jpg');
     }
 </style>

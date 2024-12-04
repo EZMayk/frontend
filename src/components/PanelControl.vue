@@ -177,7 +177,6 @@
   body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-image: url(../img/fondo1.jpg);
     background-color: #645252;
   }
   
