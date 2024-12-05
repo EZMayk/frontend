@@ -1,5 +1,10 @@
 <template>
   <div>
+    <header>
+      <div class="Encabezado">
+        <h1>Inventario de Mobiliario</h1>
+      </div>
+    </header>
     <main>
       <section class="registro-usuario">
         <h2>Registro de Usuario</h2>
@@ -59,7 +64,7 @@
               type="email"
               id="correo"
               v-model="usuario.correo"
-              placeholder="Ingrese su correo"
+              placeholder="Ingrese su correo con el dominio @live.uleam.edu.ec"
               required
             />
           </div>
@@ -107,31 +112,31 @@ export default {
         correo: "",
         contrasena: "",
       },
-      error: null, // Para manejar errores en la interfaz
+      error: null,
     };
   },
   methods: {
-    validarDatos() {
-      // Validaciones básicas antes de enviar los datos al servidor
-      if (!this.usuario.nombres.trim()) return "El campo 'Nombres' es obligatorio.";
-      if (!this.usuario.apellidos.trim()) return "El campo 'Apellidos' es obligatorio.";
-      if (!this.usuario.telefono.trim()) return "El campo 'Teléfono' es obligatorio.";
-      if (!this.usuario.direccion.trim()) return "El campo 'Dirección' es obligatorio.";
-      if (!this.usuario.correo.trim()) return "El campo 'Correo' es obligatorio.";
-      if (!this.usuario.contrasena.trim()) return "El campo 'Contraseña' es obligatorio.";
-      if (this.usuario.contrasena.length < 6)
-        return "La contraseña debe tener al menos 6 caracteres.";
-      return null; // Sin errores
-    },
-    async registrarse() {
-      try {
-        // Validar datos antes de enviarlos
-        const mensajeError = this.validarDatos();
-        if (mensajeError) {
-          alert(mensajeError);
-          return;
-        }
+  validarDatos() {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@live\.uleam\.edu\.ec$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
 
+    if (!this.usuario.nombres.trim()) return "El campo 'Nombres' es obligatorio.";
+    if (!this.usuario.apellidos.trim()) return "El campo 'Apellidos' es obligatorio.";
+    if (!this.usuario.telefono.trim()) return "El campo 'Teléfono' es obligatorio.";
+    if (!this.usuario.direccion.trim()) return "El campo 'Dirección' es obligatorio.";
+    if (!emailRegex.test(this.usuario.correo)) return "El correo debe ser del dominio @live.uleam.edu.ec.";
+    if (!passwordRegex.test(this.usuario.contrasena))
+      return "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, un número y un signo especial.";
+    return null; // No hay errores
+  },
+    async registrarse() {
+      const mensajeError = this.validarDatos();
+      if (mensajeError) {
+        alert(mensajeError);
+        return;
+      }
+
+      try {
         const response = await fetch("http://localhost:3000/api/registro", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -142,7 +147,6 @@ export default {
           alert("Usuario registrado con éxito. Redirigiendo...");
           this.$router.push("/login");
         } else {
-          // Manejar errores específicos del backend
           const errorData = await response.json();
           alert(`Error: ${errorData.message || "Error al registrar el usuario."}`);
         }
@@ -155,46 +159,102 @@ export default {
 };
 </script>
 
-
 <style scoped>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
 .Encabezado {
-  text-align: center;
-  background-color: #f4f4f4;
-  padding: 1rem;
-}
-
-main {
-  max-width: 600px;
-  margin: 2rem auto;
-}
-
-.registro-usuario {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #ffffff;
-}
-
-.input-group {
-  margin-bottom: 1rem;
-}
-
-.input-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    background-color: #645252;
+    text-align: center;
+    padding: 18px;
+    color: white;
 }
 
 footer {
-  text-align: center;
-  margin-top: 2rem;
-  font-size: 0.9rem;
+    background-color: #645252;
+    text-align: center;
+    padding: 8px;
+    color: white;
+    font-size: 14px;
+    margin-top: auto;
+    width: 100%; /* Asegura que ocupe todo el ancho */
 }
+
+.Encabezado h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+.login-usuario,
+.registro-usuario {
+    background-color: white;
+    padding: 20px;
+    max-width: 400px;
+    margin: 30px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+h2 {
+    color: #000000;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 94%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #770c0c;
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #645252;
+}
+
+p {
+    text-align: center;
+}
+
+p a {
+    color: #770c0c;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
 </style>

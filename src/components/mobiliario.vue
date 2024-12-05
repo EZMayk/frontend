@@ -1,199 +1,99 @@
 <template>
   <div>
+    <header>
+      <div class="Encabezado">
+        <h1 class="titulo">Sistema de Gestión de Inventario</h1>
+        <button id="menu-boton" @click="toggleMenu">☰</button>
+        <div id="menu-desplegable" class="menu-desplegable" v-show="menuVisible">
+          <ul>
+            <li><router-link to="/login">Cerrar Sesión</router-link></li>
+          </ul>
+        </div>
+      </div>
+      <nav class="Menu">
+        <router-link to="/panel-control">Inicio</router-link>
+        <router-link to="/mobiliarios">Inventario</router-link>
+        <router-link to="/reportes">Reportes</router-link>
+        <router-link to="/perfil-usuario">Perfil</router-link>
+      </nav>
+    </header>
+
     <main>
-      <section class="registro-usuario">
-        <h2>Registro de Usuario</h2>
-        <form @submit.prevent="registrarse">
-          <!-- Grupo para el nombre -->
-          <div class="input-group">
-            <label for="nombres">Nombres:</label>
-            <input
-              type="text"
-              id="nombres"
-              v-model="usuario.nombres"
-              placeholder="Ingrese sus nombres"
-              required
-            />
-          </div>
-
-          <!-- Grupo para el apellido -->
-          <div class="input-group">
-            <label for="apellidos">Apellidos:</label>
-            <input
-              type="text"
-              id="apellidos"
-              v-model="usuario.apellidos"
-              placeholder="Ingrese sus apellidos"
-              required
-            />
-          </div>
-
-          <!-- Grupo para el teléfono -->
-          <div class="input-group">
-            <label for="telefono">Teléfono:</label>
-            <input
-              type="tel"
-              id="telefono"
-              v-model="usuario.telefono"
-              placeholder="Ingrese su teléfono"
-              required
-            />
-          </div>
-
-          <!-- Grupo para la dirección -->
-          <div class="input-group">
-            <label for="direccion">Dirección:</label>
-            <input
-              type="text"
-              id="direccion"
-              v-model="usuario.direccion"
-              placeholder="Ingrese su dirección"
-              required
-            />
-          </div>
-
-          <!-- Grupo para el correo -->
-          <div class="input-group">
-            <label for="correo">Correo:</label>
-            <input
-              type="email"
-              id="correo"
-              v-model="usuario.correo"
-              placeholder="Ingrese su correo"
-              required
-            />
-          </div>
-
-          <!-- Grupo para la contraseña -->
-          <div class="input-group">
-            <label for="contrasena">Contraseña:</label>
-            <input
-              type="password"
-              id="contrasena"
-              v-model="usuario.contrasena"
-              placeholder="Ingrese su contraseña"
-              required
-            />
-          </div>
-
-          <!-- Botón para enviar -->
-          <button type="submit">REGISTRARSE</button>
-        </form>
-
-        <!-- Enlace para iniciar sesión -->
-        <p>
-          ¿Ya tiene una cuenta?
-          <router-link to="/iniciar-sesion">Inicie sesión aquí</router-link>
-        </p>
-      </section>
+      <h2>Registrar Mobiliario</h2>
+      <form @submit.prevent="agregarMueble">
+        <div class="input-group">
+          <input type="number" v-model="mueble.id" placeholder="ID del mueble" required />
+        </div>
+        <div class="input-group">
+          <input type="text" v-model="mueble.nombre" placeholder="Nombre del mueble" required />
+        </div>
+        <div class="input-group">
+          <input type="text" v-model="mueble.tipo" placeholder="Tipo de mueble" required />
+        </div>
+        <div class="input-group">
+          <input type="text" v-model="mueble.ubicacion" placeholder="Ubicación" required />
+        </div>
+        <div class="input-group">
+          <select v-model="mueble.estado" required>
+            <option value="nuevo">Nuevo</option>
+            <option value="danado">Dañado</option>
+            <option value="en-reparacion">En reparación</option>
+          </select>
+        </div>
+        <button type="submit">Agregar Mueble</button>
+      </form>
     </main>
-
-    <footer>
-      <p>&copy; 2024 Gestión de Inventario</p>
-    </footer>
   </div>
 </template>
-
 <script>
 export default {
-  name: "RegistroUsuario",
+  name: "RegistrarMobiliario",
   data() {
     return {
-      usuario: {
-        nombres: "",
-        apellidos: "",
-        telefono: "",
-        direccion: "",
-        correo: "",
-        contrasena: "",
+      menuVisible: false,
+      mueble: {
+        id: null,
+        nombre: "",
+        tipo: "",
+        ubicacion: "",
+        estado: "nuevo",
       },
     };
   },
   methods: {
-    async registrarse() {
+    toggleMenu() {
+      this.menuVisible = !this.menuVisible;
+    },
+    async agregarMueble() {
       try {
-        // Validación y envío de datos al servidor
-        const response = await fetch("http://localhost:3000/api/registro", {
+        const response = await fetch("/api/inventario", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(this.usuario),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.mueble),
         });
 
         if (response.ok) {
-          const result = await response.json(); // Cambié `data` por `result` para evitar el error
-          console.log("Usuario registrado:", result);
-          alert("Registro exitoso. Redirigiendo al panel de control...");
-          this.$router.push("/panel-control");
+          const data = await response.json();
+          alert(data.message);
+          this.resetForm();
         } else {
           const errorData = await response.json();
-          alert(`Error al registrar el usuario: ${errorData.message}`);
+          alert(`Error: ${errorData.message}`);
         }
       } catch (error) {
-        console.error("Error en la solicitud:", error);
-        alert("Ocurrió un error inesperado.");
+        console.error("Error:", error);
+        alert("Error al conectar con el servidor.");
       }
+    },
+    resetForm() {
+      this.mueble = {
+        id: null,
+        nombre: "",
+        tipo: "",
+        ubicacion: "",
+        estado: "nuevo",
+      };
     },
   },
 };
 </script>
-
-<style scoped>
-.Encabezado {
-  text-align: center;
-  background-color: #f4f4f4;
-  padding: 1rem;
-}
-
-main {
-  max-width: 600px;
-  margin: 2rem auto;
-}
-
-.registro-usuario {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #ffffff;
-}
-
-.input-group {
-  margin-bottom: 1rem;
-}
-
-.input-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
-  display: block;
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-footer {
-  text-align: center;
-  margin-top: 2rem;
-  font-size: 0.9rem;
-}
-</style>
